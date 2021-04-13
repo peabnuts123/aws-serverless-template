@@ -1,0 +1,49 @@
+%full-height-table-rows {
+  height: 1px; // Hacks 😢
+
+  td {
+    height:100%;
+  }
+}
+
+.project-table {
+  @extend %full-height-table-rows;
+  width: 100%;
+}
+
+.project-table__row {
+  td {
+    vertical-align: middle;
+  }
+  &.is-loading {
+    background-color: rgba(black, 7%);
+  }
+
+  &.is-done {
+    background-color: rgba($success, 25%);
+    color: rgba(darken($success, 25%), 0.8);
+  }
+}
+
+.project-table__edit-column {
+  height: 100%;
+
+  @include until($tablet) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    >.button:first-child {
+      margin-bottom: map-get($map: $spacing-values, $key: "3")
+    }
+  }
+
+  @include from($tablet) {
+    display: flex;
+    flex-direction: row;
+
+    >.button:first-child {
+      margin-right: map-get($map: $spacing-values, $key: "3")
+    }
+  }
+}

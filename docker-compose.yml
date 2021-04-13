@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  localstack:
+    container_name: "my-project_localstack"
+    image: localstack/localstack
+    ports:
+      - "4578:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=apigateway,cloudwatchlogs,iam,dynamodb,lambda,sts
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR:-}
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  api:
+    image: "my-project-api:latest"
+    build: ./src/api
+    user: "1000:1000"
+    container_name: my-project_api
+    restart: unless-stopped
+    depends_on:
+      - localstack
+    environment:
+      NODE_ENV: Production
+      ENVIRONMENT_ID: docker
+      PORT: 8080 # Must match container port mounted in `ports`
+    ports:
+      - '8000:8080/tcp'

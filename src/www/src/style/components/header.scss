@@ -1,0 +1,33 @@
+.navbar-menu {
+  @include until($desktop) {
+    position: absolute;
+    width: 100%;
+  }
+}
+
+.navbar-burger {
+  @include from($desktop) {
+    display: none;
+  }
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar__mobile-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  cursor: initial;
+  z-index: 10;
+
+  background-color: rgba(black, 0.5);
+  cursor: pointer;
+
+  @include from($desktop) {
+    display: none;
+  }
+}
