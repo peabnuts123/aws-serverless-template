@@ -1,0 +1,38 @@
+{
+  "name": "my-project-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "simulate-build": "npm run type-check && npm run lint && npm run test && npm run build && echo 'Build succeeded'",
+    "lint": "eslint --max-warnings 0 --no-error-on-unmatched-pattern \"./*.{js,ts}\" \"src/**/*.{js,ts}\" \"test/**/*.{js,ts}\"",
+    "build": "rm -rf build && parcel build 'src/handlers/www-proxy/index.ts' --dist-dir build --no-source-maps",
+    "type-check": "tsc",
+    "type-check:test": "tsc --project test",
+    "test": "jest",
+    "test:watch": "nodemon --ext 'ts,js' --exec 'npm test'",
+    "test:coverage": "jest --collectCoverage true && serve --config serve.coverage.json --no-clipboard -l 8081"
+  },
+  "author": "peabnuts123",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "aws-lambda": "^1.0.6"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-cloudfront": "^3.23.0",
+    "@aws-sdk/credential-provider-ini": "^3.23.0",
+    "@babel/preset-env": "^7.14.8",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/aws-lambda": "^8.10.64",
+    "@types/jest": "^26.0.24",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.15.0",
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "parcel": "^2.0.0-beta.2",
+    "serve": "^12.0.0",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.1.2",
+    "yargs": "^16.2.0"
+  }
+}
