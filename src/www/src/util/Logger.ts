@@ -20,6 +20,7 @@ export default class Logger {
    */
   public static setLogLevel(newLogLevel: LogLevel): void {
     this.currentLogLevel = newLogLevel;
+    this.log(LogLevel.debug, "Setting log level to: ", newLogLevel);
   }
 
   /**

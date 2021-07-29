@@ -1,4 +1,3 @@
-import { Link, navigate } from "gatsby";
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { action } from "mobx";
 import { observer } from "mobx-react-lite";
@@ -17,13 +16,23 @@ import Spinner from "@app/components/spinner";
 import Task from "@app/models/Task";
 import AutoSizeTextarea from "@app/components/auto-size-textarea";
 import classNames from "classnames";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-interface Props {
-  location: Location;
+interface RouteParams {
+  projectId: string;
 }
 
-const ProjectPage = observer(((props) => {
+interface ProjectPageContentProps {
+  projectId: string;
+}
+
+const ProjectPage = observer((() => {
+  const Router = useRouter();
   const { TodoStore } = useStores();
+
+  // Route params
+  const { projectId } = Router.query as unknown as RouteParams; // @NOTE Type laundering
 
   useEffect(() => {
     if (!TodoStore.HasLoaded) {
@@ -34,11 +43,15 @@ const ProjectPage = observer(((props) => {
   return (
     <section className="section">
       {/* Back button */}
-      <Link to="/" className="button is-info" role="button"><BackIcon className="mr-2" /> Return to project list</Link>
+      <Link href="/">
+        <a className="button is-info" role="button">
+          <BackIcon className="mr-2" /> Return to project list
+        </a>
+      </Link>
 
       {/* Page content */}
       {TodoStore.HasLoaded && (
-        <ProjectPageContent {...props} />
+        <ProjectPageContent projectId={projectId} />
       )}
 
       {/* "Loading..." */}
@@ -47,23 +60,22 @@ const ProjectPage = observer(((props) => {
       )}
     </section>
   );
-}) as FunctionComponent<Props>);
+}) as FunctionComponent);
 
-const ProjectPageContent = observer((({ location }) => {
+const ProjectPageContent = observer((({ projectId }) => {
+  const Router = useRouter();
   const { TodoStore } = useStores();
 
   // Get ID from URL
-  const url = new URL(location.href);
-  const projectId = url.searchParams.get('id');
-  if (projectId === null) {
+  if (projectId === undefined) {
     Logger.logWarning("No `id` param supplied");
-    return navigate('/');
+    return Router.push('/');
   }
   // Get Project from ID
   const project = TodoStore.getProjectById(projectId);
   if (project === undefined) {
     Logger.logWarning(`No project exists with id: ${projectId}`);
-    return navigate('/');
+    return Router.push('/');
   }
 
   // State
@@ -210,7 +222,7 @@ const ProjectPageContent = observer((({ location }) => {
       </table>
     </div>
   );
-}) as FunctionComponent<Props>);
+}) as FunctionComponent<ProjectPageContentProps>);
 
 const ProjectPageLoading = observer(() => {
   return (

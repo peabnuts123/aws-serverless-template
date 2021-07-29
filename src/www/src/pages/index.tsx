@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { action } from "mobx";
-import { navigate } from "gatsby";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -9,15 +8,17 @@ import {
   XSquare as CancelIcon,
   PlusSquare as CreateIcon,
 } from 'react-feather';
+import classNames from "classnames";
+import { useRouter } from "next/router";
 
 import { useStores } from "@app/stores";
 import Spinner from "@app/components/spinner";
 import Project from "@app/models/Project";
 import AutoSizeTextarea from "@app/components/auto-size-textarea";
-import classNames from "classnames";
 
-const IndexPage: FunctionComponent = observer(() => {
+const IndexPage = observer((() => {
   const { TodoStore } = useStores();
+  const Router = useRouter();
 
   useEffect(action(() => {
     void TodoStore.ensureProjectsLoaded();
@@ -31,7 +32,7 @@ const IndexPage: FunctionComponent = observer(() => {
   // Functions
   const onAttemptToNavigate = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>, project: Project): void => {
     if (e.target instanceof HTMLTableCellElement && !project.isBeingCreated) {
-      void navigate(`/project?id=${project.id}`);
+      void Router.push(`/project/${project.id}`);
     }
   };
   const onBeginEditingProject = (project: Project): void => {
@@ -133,7 +134,7 @@ const IndexPage: FunctionComponent = observer(() => {
                           // Editing another project
                           <>
                             &nbsp;
-                        </>
+                          </>
                         )
                       )}
                     </>
@@ -166,6 +167,6 @@ const IndexPage: FunctionComponent = observer(() => {
       )}
     </section>
   );
-}) as FunctionComponent;
+}) as FunctionComponent);
 
 export default IndexPage;

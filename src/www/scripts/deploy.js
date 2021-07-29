@@ -42,7 +42,7 @@ const bucketName = terraformOutput['www_bucket_name'].value;
 exec('npm install && npm run build');
 
 // Sync files to s3
-exec(`aws s3 sync ./public "s3://${bucketName}" --acl 'public-read' --profile 'my-project'`);
+exec(`aws s3 sync ./out "s3://${bucketName}" --acl 'public-read' --profile 'my-project'`);
 
 console.log(`Successfully deployed www to bucket: ${bucketName}.`);
 

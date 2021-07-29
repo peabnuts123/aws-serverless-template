@@ -1,20 +1,28 @@
-import classNames from "classnames";
-import { Link } from "gatsby";
+import classNames, { Argument as ClassNamesArgument } from "classnames";
 import React, { FunctionComponent, useState } from "react";
 import {
   Menu as MenuIcon,
 } from 'react-feather';
-
-import useRouteChange from "@app/hooks/use-route-change";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const Index: FunctionComponent = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Close menus on route change (i.e. when you navigate using on the of the menus)
+    router.events.on('routeChangeComplete', () => {
+      setIsMobileNavOpen(false);
+    });
+  }, []);
+
   // State
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
-  // Close menus on route change (i.e. when you navigate using on the of the menus)
-  useRouteChange((_args) => {
-    setIsMobileNavOpen(false);
-  });
+  // Functions
+  const isCurrentRoute = (route: string): boolean => router.route === route;
+  const hasActiveClassName = (route: string): ClassNamesArgument  => ({ 'is-active': isCurrentRoute(route) });
 
   return (
     <>
@@ -26,19 +34,23 @@ const Index: FunctionComponent = () => {
       <nav className="navbar mb-3" role="navigation" aria-label="main navigation">
         <div className="container is-max-desktop">
           <div className="navbar-brand">
-            <Link to="/" className="navbar-item is-size-4 has-text-weight-bold is-family-primary has-text-primary">
-              My Project
+            <Link href="/">
+              <a className="navbar-item is-size-4 has-text-weight-bold is-family-primary has-text-primary">My Project</a>
             </Link>
 
             <a role="button" className="navbar-burger" aria-label="menu" aria-expanded="false" onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}>
-                <MenuIcon size={20} />
+              <MenuIcon size={20} />
             </a>
           </div>
 
           <div className={classNames("navbar-menu", { 'is-active': isMobileNavOpen })}>
             <div className="navbar-start">
-              <Link className="navbar-item" activeClassName="is-active" to="/">Home</Link>
-              <Link className="navbar-item" activeClassName="is-active" to="/about">About</Link>
+              <Link href="/">
+                <a className={classNames("navbar-item", hasActiveClassName('/'))}> Home</a>
+              </Link>
+              <Link href="/about">
+                <a className={classNames("navbar-item", hasActiveClassName('/test'))}>About</a>
+              </Link>
             </div>
           </div>
         </div>

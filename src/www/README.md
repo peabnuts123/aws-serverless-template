@@ -1,18 +1,21 @@
 # AWS Serverless Template - WWW / Frontend Client
 
-This is the frontend project. It is a Gatsby (React) project that is served statically and cached by CloudFront. It communicates to the API on the same domain using AJAX (fetch) calls for data dynamically, on the fly.
+This is the frontend project. It is a Next.js (React) project that is served statically and cached by CloudFront. It communicates to the API on the same domain using AJAX (fetch) calls for requesting data as it is needed. The site is pre-rendered at compile-time, meaning you will always be served the page you request, not just `index.html` all the time (like most single-page-apps). The site also returns correct 404 responses for pages that don't exist. This all makes for much better SEO, and performance for users.
 
 ## Architecture
 
-The project is a single-page-app / static site generated using [Gatsby](https://github.com/gatsbyjs/gatsby), which means it is a React project. The site is pre-rendered at compile-time from a set of managed content. At runtime, once the site has loaded, React takes over as a single-page-app, and fetches dynamic data from the API. You can learn more about Gatsby [here](https://www.gatsbyjs.com).
+The project is a single-page-app / static site generated using [Next.js](https://github.com/vercel/next.js/), which means it is a React project. The site is pre-rendered at compile-time from a set of managed content. At runtime, once the site has loaded, React takes over as a single-page-app, and fetches dynamic data from the API. You can learn more about Next.js [here](https://nextjs.org/).
 
 The project uses [MobX](https://mobx.js.org/README.html) for state management. "Stores" contain different sets of state for different areas of the app.
 
 [Bulma](https://bulma.io/) is included and used in the sample application for brevity, so I didn't have to ship my whole CSS framework in this project just to make a demo. You can use your own framework or whatever framework you want to use, it's very simple to remove (just remove the import in `vendor.scss`).
 
-The frontend project fetches all of the data it needs, including authentication details through the [API](../api/README.md) project. Domain-specific "Services" are written to abstract API implementation details away from the business logic of the app, exposing functions for interacting with the API. Usually these Services will be used from within a Store, and the results stored in mobx-observed state, rather than from a component directly.
+The frontend project fetches all of the data it needs through the [API](../api/README.md) project. Domain-specific "Services" are written to abstract API implementation details away from the business logic of the app, exposing functions for interacting with the API. Usually these Services will be used from within a Store, and the results stored in mobx-observed state, rather than from a component directly.
 
 For production, the API is expected to be hosted on the same domain as the frontend, on the path `/api`. For development purposes, though, the API is expected to be on a separate domain (e.g. https://localhost:5000 vs. http://localhost:8080). For projects that use authentication (e.g. OAuth), cookies will not work cross-domain unless you are on a secure context e.g. localhost, which is why the project is set up this way.
+
+### Static site behaviour (SEO, performance)
+When running in a cloud environment, CloudFront is configured to serve the frontend client such that the corresponding statically generated page is served when the site is requested. e.g. if you request `/about` you will be served `about.tsx`. This means that whenever you load the site, the page you are landing on is what is rendered immediately. This contrasts with how most single-page-app frameworks work wherein you are generally served `index.html`, and once the site loads, it quickly routes to the page specified in the URL. This has performance and SEO implications, which are mitigated by correctly serving the page that is requested. Dynamic routes are also included in this, so requests to `/project/f64b99f3-9965-40ec-ac81-4f597e2967aa` are served `project/[projectId].tsx`. This also allows the CloudFront distribution to correctly serve 404s for pages that don't exist, leveraging S3's "static website hosting" feature to serve the `404.tsx` page whenever a request is unmatched. This all comes together to make the frontend behave like a super-fast server-rendered web page, with none of the associated costs.
 
 ## Local development
 
@@ -20,7 +23,7 @@ For production, the API is expected to be hosted on the same domain as the front
 
 In order to run the project locally, you will need the following:
 
-  - [Node.js and npm](https://nodejs.org/en/)
+  - [Node.js and npm](https://nodejs.org)
   - You must have an instance of the API running in order for the site to work properly. You can run it locally in another terminal window, or by running it in docker. See [the API's README](../api/README.md) on how to do this.
 
 ### Running the project (local)
@@ -91,4 +94,5 @@ To deploy the frontend client to a cloud environment:
 
 ## Work backlog / TODO
 
-  - _Nothing at-present_.
+  <!-- - _Nothing at-present_. -->
+  - Rewrite deploy.js to use aws-sdk instead of shelling out to aws-cli
