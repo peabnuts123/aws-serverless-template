@@ -94,4 +94,4 @@ To deploy the API to a cloud environment:
 
 ## Work backlog / TODO
 
-  - _Nothing at-present_.
+  - Rewrite deploy.js to use aws-sdk instead of shelling out to aws-cli
