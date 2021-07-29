@@ -14,19 +14,24 @@ DynamoDB is relatively easy to work with for simple projects, but mostly it was 
 DynamoDB can't be easily mocked so when running the project locally, Localstack is used to spin up a compatible mock of DynamoDB (running on Docker).
 
 
-### API
+### API (src/api)
 
 The API is written in TypeScript for performance reasons. JavaScript is very quick to start up, so "cold-boot" times are relatively low (a second or so). Each API endpoint exports a handler function for that particular endpoint. In AWS these functions are each deployed to their own Lambda and wired together using API Gateway. In local development, a simple express server is started which maps the endpoints to each handler function.
 
 When deployed, the API is proxied behind CloudFront so that the API and the frontend client can be served from the same domain.
 
 
-### Frontend client
+### Frontend client (src/www)
 
-The frontend is a "single-page app" written in React (actually, Gatsby). This was mostly chosen as it is the current favourite in the frontend community. Working in React is the easiest way to find support and integrations with other packages and libraries. Gatsby sets up a working project with sane defaults which makes it much easier to work with React. Gatsby also pre-renders all pages on your site at deploy-time so it makes for a rather snappy site load (no JavaScript bundle woes).
+The frontend is a "single-page app" written in React (actually, Next.js). This was mostly chosen as it is the current favourite in the frontend community. Working in React is the best way to find support and integrations with other packages and libraries, which can quickly outweigh benefits gained from using other frameworks. Next.js sets up a working project with sane defaults which makes it much easier to work with React. Next.js also pre-renders all pages on your site at deploy-time so it makes for a rather snappy site load. Nevertheless, you are welcome to entirely replace the frontend with the framework of your choosing, as it is a standalone component that has no dependencies on it.
 
-The web client is hosted on S3, and served through CloudFront. Cloudfront caches all the site's assets so, again, load-times should be relatively quick. The cache is disabled for the root `index.html` document so deployments to the site are live instantly.
+The web client is hosted on S3, and served through CloudFront. CloudFront caches all the site's assets so, again, load-times should be relatively quick. The cache is not enabled for content pages (i.e. not javascript bundles etc.) so deployments to the site are live instantly.
 
+### CloudFront (src/app)
+
+In a production environment, the entrypoint into the app is through a CloudFront Distribution. This proxies both the frontend client as well as the API, so both can be served on the same domain. CloudFront manages caching of specific resources to increase request performance of your application around the world.
+
+CloudFront also contains a small amount of logic in the form of "CloudFront Functions". These are simple functions that transform requests to/from CloudFront. Currently there is only 1 function, whose job it is to rewrite requests to the frontend client to ensure the correct HTML page is served based on the user's request.
 
 ## Development
 
@@ -37,8 +42,9 @@ This repository contains a fully-working demo application. The application isn't
 
 Each project is its own self-contained "component". A guide for running / developing each component can be found in each respective README:
 
-  - [API](./src/api/README.md)
+  - [api](./src/api/README.md)
   - [www](./src/www/README.md)
+  - [app](./src/app/README.md)
   - [Terraform (infrastructure)](./terraform/README.md)
 
 The project as-a-whole is designed to be able to run in a few ways:
@@ -48,20 +54,19 @@ The project as-a-whole is designed to be able to run in a few ways:
     - e.g. if you're working on the frontend and just need a working API to be running, you can run the API and the DB in docker, and run the frontend manually
   - On cloud infrastructure i.e. AWS
 
-Broadly you will need the following things to run the project locally:
+Broadly speaking you will need the following things to run the project locally:
   - Node.js and npm
   - Docker
 
 
 ## Deployment
 
-Deployment of this project to an AWS environment is done in 3 parts:
+Deployment of this project to an AWS environment is done in multiple steps:
 
 1. Use Terraform to provision the AWS infrastructure needed
-1. Compile and build the code needed for the API
-1. Compile and build the code needed for the frontend client
+1. Build and deploy the code needed for each of the individual components (api, app, www)
 
-Check the individual docs of each ([Terraform](./terraform/README.md), [API](./src/api/README.md), [WWW](./src/www/README.md)) for instructions on how to do these steps in detail.
+Check the individual docs of each ([Terraform](./terraform/README.md), [api](./src/api/README.md), [app](./src/app/README.md), [www](./src/www/README.md)) for instructions on how to do these steps in detail.
 
 ## Backlog
   - DRY enhancements to API handlers
