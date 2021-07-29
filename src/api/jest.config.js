@@ -18,7 +18,7 @@ module.exports = {
     '<rootDir>/test/setup/mock-fetch.ts',
   ],
   testRegex: [
-    "test/.*\\.test.[jt]s?$",
+    "test/.*\\.test.[jt]s$",
   ],
   moduleNameMapper: {
     // DB - @NOTE make sure you don't call any mother modules 'db'...
