@@ -4,9 +4,4 @@ resource "aws_cloudwatch_log_group" "lambda" {
 
   name              = "/aws/lambda/${each.value.name}"
   retention_in_days = 14
-
-  tags = {
-    project = var.project_id
-    environment = var.environment_id
-  }
 }

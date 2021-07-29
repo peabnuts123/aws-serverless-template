@@ -24,3 +24,8 @@ output "www_bucket_name" {
   value       = module.www.s3_bucket_name
   description = "S3 bucket name, for deploying www project"
 }
+
+output "wwwproxy_function_name" {
+  value = aws_cloudfront_function.wwwproxy.name
+  description = "Name of 'www-proxy' CloudFront Function, for deplying handler code"
+}

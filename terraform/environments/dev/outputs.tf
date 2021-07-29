@@ -14,3 +14,6 @@ output "cloudfront_domain_name" {
 output "domain_name" {
   value = module.app.domain_name
 }
+output "wwwproxy_function_name" {
+  value = module.app.wwwproxy_function_name
+}

@@ -1,5 +1,5 @@
 # Cloudfront distribution
-#   Woah boy does cloudfront need a loooooot of configuration!
+#   Woah boy cloudfront sure needs a loooooot of configuration!
 resource "aws_cloudfront_distribution" "app" {
   enabled = true
 
@@ -15,14 +15,6 @@ resource "aws_cloudfront_distribution" "app" {
   #   PriceClass_100 takes about ~20m to geo-replicate
   #   PriceClass_All takes about ~45m to geo-replicate
   price_class = "PriceClass_100"
-
-  # Rewrite all 404s as 200s
-  # I know this isn't ideal. But it gives us our SPA behaviour
-  custom_error_response {
-    error_code         = "404"
-    response_code      = "200"
-    response_page_path = "/index.html"
-  }
 
   # WWW
   origin {
@@ -58,10 +50,10 @@ resource "aws_cloudfront_distribution" "app" {
     viewer_protocol_policy = "redirect-to-https"
     target_origin_id       = local.www_origin_id
 
-    # Cache retention (1 hour)
-    default_ttl = 3600
+    # Cache retention (disabled)
+    default_ttl = 0
     min_ttl     = 0
-    max_ttl     = 3600
+    max_ttl     = 0
 
     # Forward nothing but request path to origin
     forwarded_values {
@@ -70,6 +62,11 @@ resource "aws_cloudfront_distribution" "app" {
       cookies {
         forward = "none"
       }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.wwwproxy.arn
     }
   }
 
@@ -97,19 +94,19 @@ resource "aws_cloudfront_distribution" "app" {
     }
   }
 
-  // Do not cache root
+  // Cache fingerprinted assets
   ordered_cache_behavior {
     allowed_methods        = ["HEAD", "GET", "OPTIONS"]
     cached_methods         = ["HEAD", "GET"]
-    path_pattern           = "/index.html"
+    path_pattern           = "/_next/*"
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
     target_origin_id       = local.www_origin_id
 
-    # Cache retention (disabled)
-    default_ttl = 0
+    # Cache retention (5 minutes)
+    default_ttl = 300
     min_ttl     = 0
-    max_ttl     = 0
+    max_ttl     = 300
 
     forwarded_values {
       query_string = false
@@ -128,16 +125,30 @@ resource "aws_cloudfront_distribution" "app" {
     }
   }
 
-  # AWS tags
-  tags = {
-    project     = var.project_id
-    environment = var.environment_id
-  }
-
   # HTTPS certificate (from ACM)
   viewer_certificate {
     acm_certificate_arn      = data.aws_acm_certificate.default.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
+  }
+}
+
+# Cloudfront function - www-proxy
+resource "aws_cloudfront_function" "wwwproxy" {
+  name    = local.wwwproxy_function_name
+  runtime = "cloudfront-js-1.0"
+  code    = <<-CODE
+    /* dummy handler, for provisioning only. */
+    function handler(event) {
+      return event.request;
+    }
+  CODE
+
+  lifecycle {
+    # Ignore independently deployed changes to code
+    ignore_changes = [
+      code,
+      comment,
+    ]
   }
 }

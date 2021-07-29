@@ -2,11 +2,6 @@
 resource "aws_apigatewayv2_api" "api" {
   name          = "${var.project_id} (${var.environment_id})"
   protocol_type = "HTTP"
-
-  tags = {
-    project = var.project_id
-    environment = var.environment_id
-  }
 }
 
 # Default stage, auto-deploy

@@ -81,10 +81,10 @@ Each component has code that needs to be deployed into the environment as a sepa
 
 Generally speaking, these scripts just need the ID of the that is being deployed to (e.g. `node scripts/deploy.js dev`).
 
-_Remember that the local environment is not designed for running components so code cannot be deployed to this environment._
+_Remember that code cannot be deployed to the local environment, it is for development purposes only._
 
 ## Backlog / TODO
 
   - Update project_id/environment_id validation to remove underscores
   - For that matter, document build/deploy scripts dependencies
-  - Add "Comment" to each Cloudfront to describe what the heck it is
+  - Add "Comment" to each CloudFront to describe what the heck it is

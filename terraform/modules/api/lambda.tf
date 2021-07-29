@@ -11,11 +11,6 @@ resource "aws_lambda_function" "lambda" {
   memory_size   = 256
   timeout       = 3
 
-  tags = {
-    project     = var.project_id
-    environment = var.environment_id
-  }
-
   environment {
     variables = {
       NODE_ENV = "production"
