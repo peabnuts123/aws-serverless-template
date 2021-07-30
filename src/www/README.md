@@ -66,14 +66,8 @@ Running the WWW component in docker-compose is very simple.
     ```sh
     docker-compose up -d www
     ```
-    - This will compile the current code into a new docker image.
-    - If you have made some changes to the code, you will need to rebuild the docker image:
-      ```sh
-      docker-compose up --build -d www
-      ```
-    - **Note:** Don't run `--build` every time as it will fill up your system with identical images.
 
-You should be good to go!
+You should be good to go! This will run a development server in a docker container. It is a bit slow so may take a moment to spin up.
 
 ## Deploying to a cloud environment
 

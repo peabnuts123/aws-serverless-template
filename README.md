@@ -74,4 +74,3 @@ Check the individual docs of each ([Terraform](./terraform/README.md), [api](./s
   - Tests for Frontend
   - The things recorded on https://todo.winsauce.com
   - launch.json
-  - Docker for frontend (can API run locally while frontend runs in Docker?)
