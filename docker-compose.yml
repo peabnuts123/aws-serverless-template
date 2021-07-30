@@ -14,6 +14,7 @@ services:
     volumes:
       - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+
   api:
     image: "my-project-api:latest"
     build: ./src/api
@@ -23,8 +24,23 @@ services:
     depends_on:
       - localstack
     environment:
-      NODE_ENV: Production
+      NODE_ENV: production
       ENVIRONMENT_ID: docker
       PORT: 8080 # Must match container port mounted in `ports`
     ports:
       - '8000:8080/tcp'
+
+  www:
+    container_name: 'my-project_www'
+    image: 'node:lts-alpine'
+    restart: unless-stopped
+    volumes:
+      - './src/www:/home/node/www'
+    working_dir: /home/node/www
+    entrypoint: "/bin/sh"
+    command: 'run.docker.sh'
+    environment:
+      NODE_ENV: development
+      ENVIRONMENT_ID: docker
+    ports:
+      - '3000:3000/tcp'
