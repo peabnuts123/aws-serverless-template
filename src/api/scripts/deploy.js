@@ -3,8 +3,12 @@
 
 const { _: args, '$0': processName } = require('yargs').argv;
 const { execSync } = require('child_process');
+const { performance } = require('perf_hooks');
 const fs = require('fs');
 const path = require('path');
+const { LambdaClient, UpdateFunctionCodeCommand } = require('@aws-sdk/client-lambda');
+const { fromIni } = require('@aws-sdk/credential-provider-ini');
+const archiver = require('archiver');
 
 // Config
 const buildDirectory = 'build';
@@ -38,6 +42,8 @@ const rawTerraformOutput = exec('terraform output --json', {
 const terraformOutput = JSON.parse(rawTerraformOutput);
 /** @type {string[]} */
 const lambdaFunctionNames = terraformOutput['lambda_function_names'].value;
+/** @type {string} */
+const awsRegion = terraformOutput['aws_region'].value;
 
 // Build project
 exec('npm install && npm run build');
@@ -53,20 +59,41 @@ process.chdir(buildDirectory);
 
 // Install node_modules needed by build
 exec('npm ci --only production');
-// Zip build artifact
-exec(`zip -r '${zipFileName}' .`);
 
-// Deploy build artifact to lambda functions
-lambdaFunctionNames.forEach((functionName) => {
-  console.log(`Deploying function: ${functionName}...`);
-  const result = exec(`aws lambda update-function-code --function-name "${functionName}" --zip-file "fileb://${zipFileName}" --profile 'my-project'`, {
-    stdio: 'pipe',
+void (async () => {
+  await Promise.resolve();
+
+  console.log("Creating zip archive...");
+  await createZipArchive(zipFileName, '**/*');
+  console.log("Finished creating zip archive");
+
+  const lambdaClient = new LambdaClient({
+    credentials: fromIni({ profile: 'my-project' }),
+    region: awsRegion,
   });
-  console.log("Finished deploying. Result:");
-  console.log(result);
-});
 
-console.log(`Successfully deployed code to ${lambdaFunctionNames.length} lambda functions.`);
+  // Deploy build artifact to lambda functions
+  const startTimeAll = performance.now();
+  for (let i = 0; i < lambdaFunctionNames.length; i++) {
+    const functionName = lambdaFunctionNames[i];
+
+    console.log(`Deploying function: ${functionName}...`);
+    const startTime = performance.now();
+
+    const response = await lambdaClient.send(new UpdateFunctionCodeCommand({
+      FunctionName: functionName,
+      ZipFile: fs.readFileSync(zipFileName),
+    }));
+    const endTime = performance.now();
+
+    console.log(JSON.stringify(response, null, 2));
+    console.log(`Finished deploying function '${functionName}' after ${((endTime - startTime) / 1000).toFixed(1)}s`);
+  }
+  const endTimeAll = performance.now();
+
+  console.log(`Finished deploying code to ${lambdaFunctionNames.length} lambda functions after ${((endTimeAll - startTimeAll) / 1000).toFixed(1)}s`);
+})();
+
 
 /**
  *
@@ -81,4 +108,25 @@ function exec(command, options = {}) {
     encoding: 'utf-8',
     ...options,
   });
+}
+
+async function createZipArchive(outputFile, filesGlob) {
+  const output = fs.createWriteStream(outputFile);
+  const archive = archiver('zip', {
+    zlib: { level: 9 },
+  });
+  archive.pipe(output);
+
+  // Throw errors
+  archive.on('error', function (err) {
+    throw err;
+  });
+
+  // Add files to archive
+  archive.glob(filesGlob);
+
+  // Write archive
+  await archive.finalize();
+
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 }
