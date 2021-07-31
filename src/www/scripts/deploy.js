@@ -4,6 +4,10 @@
 const { _: args, '$0': processName } = require('yargs').argv;
 const { execSync } = require('child_process');
 const fs = require('fs');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { fromIni } = require('@aws-sdk/credential-provider-ini');
+const path = require('path');
+const mime = require('mime-types');
 
 // Validation
 const environmentId = args[0];
@@ -19,6 +23,9 @@ if (!fs.existsSync('package.json')) {
   console.error("You must run this script from the project root.");
   process.exit(2);
 }
+
+// Config
+const buildDirectory = './out';
 
 // Environment config
 process.env['ENVIRONMENT_ID'] = environmentId;
@@ -37,17 +44,42 @@ const rawTerraformOutput = exec('terraform output --json', {
 const terraformOutput = JSON.parse(rawTerraformOutput);
 /** @type {string[]} */
 const bucketName = terraformOutput['www_bucket_name'].value;
+/** @type {string} */
+const awsRegion = terraformOutput['aws_region'].value;
 
 // Build project
 exec('npm install && npm run build');
 
-// Sync files to s3
-exec(`aws s3 sync ./out "s3://${bucketName}" --acl 'public-read' --profile 'my-project'`);
+void (async () => {
+  // Upload files to s3
+  const s3Client = new S3Client({
+    credentials: fromIni({ profile: 'my-project' }),
+    region: awsRegion,
+  });
 
-console.log(`Successfully deployed www to bucket: ${bucketName}.`);
+  // Read all files we have
+  const filesToUpload = getAllFiles('./out');
+
+  console.log(`Uploading ${filesToUpload.length} files to S3...`);
+  let totalUploaded = 0;
+
+  // Upload all files in parallel, wait for them all to finish
+  await Promise.all(filesToUpload.map(async (file) => {
+    await s3Client.send(new PutObjectCommand({
+      Bucket: bucketName,
+      ACL: 'public-read',
+      Key: path.relative(buildDirectory, file),
+      Body: fs.readFileSync(file),
+      ContentType: getContentType(file),
+    }));
+
+    console.log(`[${++totalUploaded}/${filesToUpload.length}] Uploaded: ${file} [${getContentType(file)}]`);
+  }));
+
+  console.log(`Successfully deployed www to bucket: ${bucketName}.`);
+})();
 
 /**
- *
  * @param {string} command Command to exec
  * @param {import('child_process').ExecSyncOptionsWithStringEncoding} options
  */
@@ -59,4 +91,40 @@ function exec(command, options = {}) {
     encoding: 'utf-8',
     ...options,
   });
+}
+
+/**
+ * @param {string} directory Directory to read all files from, recursively
+ * @param {string[]} _files Temporary result variable (don't pass, used for recursion)
+ * @returns {string[]}
+ */
+function getAllFiles(directory, _files = []) {
+  // From: https://stackoverflow.com/a/66187152
+  const filesInDirectory = fs.readdirSync(directory);
+  for (const fileName of filesInDirectory) {
+    const filePath = path.join(directory, fileName);
+    if (fs.statSync(filePath).isDirectory()) {
+      getAllFiles(filePath, _files);
+    } else {
+      _files.push(filePath);
+    }
+  }
+
+  return _files;
+}
+
+/**
+ * @param {string} filePath File path to get MIME content type for
+ * @returns {string}
+ */
+function getContentType(filePath) {
+  const ext = path.extname(filePath);
+
+  // Manual content-type overrides
+  if (ext === '.ico') {
+    // Favicons. Default works, but this is a bit better / more standard
+    return 'image/x-icon';
+  } else {
+    return mime.contentType(ext);
+  }
 }

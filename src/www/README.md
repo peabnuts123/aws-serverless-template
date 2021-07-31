@@ -88,5 +88,4 @@ To deploy the frontend client to a cloud environment:
 
 ## Work backlog / TODO
 
-  <!-- - _Nothing at-present_. -->
-  - Rewrite deploy.js to use aws-sdk instead of shelling out to aws-cli
+  - _Nothing at-present_.
