@@ -1,4 +1,7 @@
 # OUTPUTS - all passthrough from app module
+output "aws_region" {
+  value = var.aws_region
+}
 output "api_url" {
   value = module.app.api_url
 }
