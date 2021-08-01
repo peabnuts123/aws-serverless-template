@@ -7,6 +7,12 @@ import getMockContext from '@test/local/util/get-mock-context';
 import getMockProxyRequest from '@test/local/util/get-mock-proxy-request';
 
 import Logger, { LogLevel } from '@app/util/Logger';
+
+// GLOBAL CONFIG (this MUST be configured before imports below)
+// @NOTE must match the table name configured in terraform/modules/db/locals.tf
+process.env.ENVIRONMENT_ID = process.env.ENVIRONMENT_ID || 'local';
+process.env.PROJECT_ID = process.env.PROJECT_ID || 'my-project';
+
 // Project
 import { handler as CreateProjectHandler } from '@app/handlers/project/create';
 import { handler as DeleteProjectHandler } from '@app/handlers/project/delete';

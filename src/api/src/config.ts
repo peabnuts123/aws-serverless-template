@@ -9,16 +9,23 @@ export interface Config {
   awsEndpoint?: string;
 }
 
+// Environment variable validation
+if (PROJECT_ID === undefined || PROJECT_ID.trim() === "") {
+  throw new Error("Environment variable `PROJECT_ID` not set");
+}
+if (ENVIRONMENT_ID === undefined || ENVIRONMENT_ID.trim() === "") {
+  throw new Error("Environment variable `ENVIRONMENT_ID` not set");
+}
+
 const baseConfig = {
-  // @NOTE defaults to "my-project" if not specified (e.g. when running locally)
-  projectTableName: `${PROJECT_ID || 'my-project'}_${ENVIRONMENT_ID}_projects`,
-  environmentId: ENVIRONMENT_ID!,
+  projectTableName: getProjectTableName(PROJECT_ID, ENVIRONMENT_ID),
+  environmentId: ENVIRONMENT_ID,
 };
 
 let config: Config;
-
 switch (ENVIRONMENT_ID) {
   case 'local':
+    // Set dummy credentials for localstack
     process.env['AWS_ACCESS_KEY_ID'] = 'local';
     process.env['AWS_SECRET_ACCESS_KEY'] = 'local';
 
@@ -28,14 +35,15 @@ switch (ENVIRONMENT_ID) {
       logLevel: LogLevel.debug,
     };
     break;
-    case 'docker':
+  case 'docker':
+    // Set dummy credentials for localstack
     process.env['AWS_ACCESS_KEY_ID'] = 'docker';
     process.env['AWS_SECRET_ACCESS_KEY'] = 'docker';
 
     config = {
       ...baseConfig,
       // @NOTE override docker table name to match `local` environment
-      projectTableName: `${PROJECT_ID || 'my-project'}_local_projects`,
+      projectTableName: getProjectTableName(PROJECT_ID, 'local'),
       awsEndpoint: 'http://localstack:4566',
       logLevel: LogLevel.normal,
     };
@@ -53,11 +61,11 @@ switch (ENVIRONMENT_ID) {
     };
     break;
   default:
-    if (ENVIRONMENT_ID === undefined || ENVIRONMENT_ID.trim() === "") {
-      throw new Error("Environment variable `ENVIRONMENT_ID` not set");
-    } else {
-      throw new Error("Unknown environment id: " + ENVIRONMENT_ID);
-    }
+    throw new Error("Unknown environment id: " + ENVIRONMENT_ID);
 }
 
 export default config;
+
+function getProjectTableName(projectId: string, environmentId: string): string {
+  return `${projectId}_${environmentId}_projects`;
+}
