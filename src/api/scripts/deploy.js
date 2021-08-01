@@ -7,7 +7,6 @@ const { performance } = require('perf_hooks');
 const fs = require('fs');
 const path = require('path');
 const { LambdaClient, UpdateFunctionCodeCommand } = require('@aws-sdk/client-lambda');
-const { fromIni } = require('@aws-sdk/credential-provider-ini');
 const archiver = require('archiver');
 
 // Config
@@ -68,7 +67,6 @@ void (async () => {
   console.log("Finished creating zip archive");
 
   const lambdaClient = new LambdaClient({
-    credentials: fromIni({ profile: 'my-project' }),
     region: awsRegion,
   });
 

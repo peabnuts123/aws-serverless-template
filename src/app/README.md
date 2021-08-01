@@ -21,6 +21,18 @@ The CloudFront Functions cannot be run locally, they are only for deployment int
 
 ## Deploying to a cloud environment
 
+### Prerequisites
+You are expected to know how to configure authentication with AWS. Some ways I know about include:
+  - Specifying a profile with environment variable `AWS_PROFILE` e.g.
+      ```sh
+        AWS_PROFILE='my-project' ./scripts/deploy.js dev
+      ```
+  - Specifying a `[default]` profile in shared credentials file (`~/.aws/credentials`)
+  - Assuming a role with the AWS CLI (e.g. `aws sts assume-role`) and then saving the credentials into environment variables (e.g. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`)
+
+You can read more about authentication with AWS [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+
+### Deploying
 To deploy to a cloud environment:
 
 1. Ensure the environment exists. Run Terraform to make sure the infrastructure exists / is up to date. See the [terraform documentation](../../terraform/README.md) for more details on this.

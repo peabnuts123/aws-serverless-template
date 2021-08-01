@@ -1,8 +1,9 @@
 # PROVIDERS
 provider "aws" {
   region     = var.aws_region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  # @NOTE hard-coded localstack credentials because localstack will accept anything
+  access_key = "local_access_key"
+  secret_key = "local_acces_key"
 
   # Overrides for localstack
   s3_force_path_style         = true

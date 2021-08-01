@@ -5,7 +5,6 @@ const { _: args, '$0': processName } = require('yargs').argv;
 const { execSync } = require('child_process');
 const fs = require('fs');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { fromIni } = require('@aws-sdk/credential-provider-ini');
 const path = require('path');
 const mime = require('mime-types');
 
@@ -53,7 +52,6 @@ exec('npm install && npm run build');
 void (async () => {
   // Upload files to s3
   const s3Client = new S3Client({
-    credentials: fromIni({ profile: 'my-project' }),
     region: awsRegion,
   });
 

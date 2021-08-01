@@ -1,10 +1,6 @@
 # Copy or rename this file to `terraform.tfvars` and fill in the values below
 # e.g. `cp example.tfvars terraform.tfvars`
 
-# Access config
-aws_access_key       = ""
-aws_secret_key       = ""
-
 # General
 # AWS region to create resources in (unless not available)
 aws_region = "us-east-1"

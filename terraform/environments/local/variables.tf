@@ -1,14 +1,4 @@
 # VARIABLES
-# AWS Access
-variable "aws_access_key" {
-  description = "AWS access key"
-  type        = string
-}
-variable "aws_secret_key" {
-  description = "AWS secret key"
-  type        = string
-}
-
 # Application environment config
 variable "aws_region" {
   description = "AWS Region to create resources in e.g. us-east-1"

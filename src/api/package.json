@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-lambda": "^3.24.0",
-    "@aws-sdk/credential-provider-ini": "^3.24.0",
     "@types/archiver": "^5.1.1",
     "@types/aws-lambda": "^8.10.64",
     "@types/cors": "^2.8.9",

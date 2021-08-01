@@ -37,9 +37,19 @@ Each component has its own module and takes in the dependencies it needs as vari
 Since Terraform is designed to be idempotent, you can use the same process to create a new environment or update an existing one.
 
 ### Prerequisites
-
 You need to have a few things before you can create an environment:
-  - The Access/Secret Key of an AWS user with the following permissions:
+
+  - You are expected to know how to configure authentication with AWS. Some ways I know about include:
+    - Specifying a profile with environment variable `AWS_PROFILE` e.g.
+      ```sh
+        AWS_PROFILE='my-project' ./scripts/deploy.js dev
+      ```
+    - Specifying a `[default]` profile in shared credentials file (`~/.aws/credentials`)
+    - Assuming a role with the AWS CLI (e.g. `aws sts assume-role`) and then saving the credentials into environment variables (e.g. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`)
+
+    - You can read more about authentication with AWS [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+
+  - However you choose to authenticate with AWS, you need to use role/user with the following permissions:
     - IAMFullAccess
     - AmazonDynamoDBFullAccess
     - CloudWatchLogsFullAccess

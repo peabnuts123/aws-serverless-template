@@ -11,7 +11,6 @@ const {
   UpdateFunctionCommand,
   PublishFunctionCommand,
 } = require('@aws-sdk/client-cloudfront');
-const { fromIni } = require('@aws-sdk/credential-provider-ini');
 
 // Config
 const buildDirectory = 'build';
@@ -49,6 +48,8 @@ const terraformOutput = JSON.parse(rawTerraformOutput);
 const wwwProxyFunctionName = terraformOutput['wwwproxy_function_name'].value;
 /** @type {string} */
 const cloudfrontDomainName = terraformOutput['cloudfront_domain_name'].value;
+/** @type {string} */
+const awsRegion = terraformOutput['aws_region'].value;
 
 // Build project
 exec('npm install && npm run build');
@@ -66,7 +67,7 @@ void (async () => {
   try {
     console.log(`Deploying CloudFront function '${wwwProxyFunctionName}'...`);
     const cloudfrontClient = new CloudFrontClient({
-      credentials: fromIni({ profile: 'my-project' }),
+      region: awsRegion,
     });
 
     // 1. Get current function's etag

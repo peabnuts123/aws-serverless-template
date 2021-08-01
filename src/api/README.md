@@ -39,7 +39,6 @@ In order to run the project locally, you will need the following:
 
 There are more npm scripts that you can run. Here is what each of them does:
   - `npm run build` - Build the project
-    - You must set the `ENVIRONMENT_ID` environment variable to specify which environment configuration is included in the build e.g. `ENVIRONMENT_ID=dev`. _NOTE: This is done automatically when using the deploy script. `deploy.js`_
   - `npm test` - Run the tests
     - You can also run `npm run test:coverage` to run the tests and collect test coverage statistics, which will then be served on a URL upon completion (to be opened in your browser). Hit CTRL-C to stop the web server after you're finished with it.
     - You can also run `npm run test:watch` to continually run the tests every time a file is changed.
@@ -78,6 +77,19 @@ You should be good to go!
 ## Deploying to a cloud environment
 
 Lastly, the API component is obviously designed run in an AWS cloud environment. Each handler is deployed to a separate Lambda function, and wired together using API Gateway (which is ultimately served by CloudFront).
+
+### Prerequisites
+You are expected to know how to configure authentication with AWS. Some ways I know about include:
+  - Specifying a profile with environment variable `AWS_PROFILE` e.g.
+      ```sh
+        AWS_PROFILE='my-project' ./scripts/deploy.js dev
+      ```
+  - Specifying a `[default]` profile in shared credentials file (`~/.aws/credentials`)
+  - Assuming a role with the AWS CLI (e.g. `aws sts assume-role`) and then saving the credentials into environment variables (e.g. `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`)
+
+You can read more about authentication with AWS [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html).
+
+### Deploying
 
 To deploy the API to a cloud environment:
 

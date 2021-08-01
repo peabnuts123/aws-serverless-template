@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.23.0",
-    "@aws-sdk/credential-provider-ini": "^3.23.0",
     "@babel/preset-env": "^7.14.8",
     "@babel/preset-typescript": "^7.14.5",
     "@types/aws-lambda": "^8.10.64",
