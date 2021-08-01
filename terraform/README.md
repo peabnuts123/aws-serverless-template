@@ -62,8 +62,8 @@ You need to have a few things before you can create an environment:
   - A domain set up (and active) in ACM
     - TL;DR:
       1. Add your domain to ACM
-      1. Add a CNAME record to your domain with the name/value that ACM gives you
-      1. Wait for it to validate
+      1. Add a CNAME record to your DNS settings with the name/value that ACM gives you
+      1. Wait for it to validate (usually only a few minutes)
       1. Now you are good to go
     - You will use this domain in the config e.g. `dev.myproject.com`
 
@@ -89,12 +89,10 @@ This project is set-up to be able to deploy its infrastructure to a running inst
 
 Each component has code that needs to be deployed into the environment as a separate step. Each component folder will have some deploy scripts for doing this, and the documentation for deploying the code for each component lives in each respective README.
 
-Generally speaking, these scripts just need the ID of the that is being deployed to (e.g. `node scripts/deploy.js dev`).
+Generally speaking, these scripts just need the ID of the environment that is being deployed to (e.g. `node scripts/deploy.js dev`).
 
 _Remember that code cannot be deployed to the local environment, it is for development purposes only._
 
 ## Backlog / TODO
 
-  - Update project_id/environment_id validation to remove underscores
-  - For that matter, document build/deploy scripts dependencies
-  - Add "Comment" to each CloudFront to describe what the heck it is
+  - _Nothing at-present_.
