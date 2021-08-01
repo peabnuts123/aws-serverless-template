@@ -10,6 +10,9 @@ resource "aws_cloudfront_distribution" "app" {
   # Default file to serve when requesting `/`
   default_root_object = "index.html"
 
+  # Description
+  comment = "Project: '${var.project_id}' - Environment: '${var.environment_id}'"
+
   # Pricing tier - see https://aws.amazon.com/cloudfront/pricing/ for details
   # Basically just US / Canada - should be faster to provision
   #   PriceClass_100 takes about ~20m to geo-replicate
