@@ -69,8 +69,4 @@ Deployment of this project to an AWS environment is done in multiple steps:
 Check the individual docs of each ([Terraform](./terraform/README.md), [api](./src/api/README.md), [app](./src/app/README.md), [www](./src/www/README.md)) for instructions on how to do these steps in detail.
 
 ## Backlog
-  - DRY enhancements to API handlers
-  - Tests for API
-  - Tests for Frontend
-  - The things recorded on https://todo.winsauce.com
-  - launch.json
+  - launch.json for debugging various aspects in vscode
