@@ -106,5 +106,4 @@ To deploy the API to a cloud environment:
 
 ## Work backlog / TODO
 
-  - Use AWSSDK v3
   - DRY enhancements to API handlers

@@ -1,5 +1,5 @@
-import AWS from 'aws-sdk';
-import { ServiceConfigurationOptions } from 'aws-sdk/lib/service';
+import { DynamoDBClient, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, GetCommand, ScanCommand, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuid } from 'uuid';
 
 import Config from '../config';
@@ -11,19 +11,20 @@ import Task from './models/Task';
 
 
 class Db implements IDatabase {
-  private docClient: AWS.DynamoDB.DocumentClient;
+  private docClient: DynamoDBDocumentClient;
 
   public constructor() {
-    this.docClient = new AWS.DynamoDB.DocumentClient({
-      ...this.baseOptions,
-    });
+    const dynamoDbClient = new DynamoDBClient(this.baseOptions);
+    this.docClient = DynamoDBDocumentClient.from(dynamoDbClient);
   }
 
-  private get baseOptions(): ServiceConfigurationOptions {
-    const options: ServiceConfigurationOptions = {
+  private get baseOptions(): DynamoDBClientConfig {
+    const options: DynamoDBClientConfig = {
       region: 'us-east-1',
     };
 
+    // @NOTE assumption: Any configuration for `Config.awsEndpoint` implies
+    //  the use of Localstack
     if (Config.awsEndpoint) {
       options.endpoint = Config.awsEndpoint;
       Logger.log(LogLevel.debug, "Setting AWS endpoint to localstack");
@@ -43,10 +44,10 @@ class Db implements IDatabase {
   }
 
   public async getProject(id: string): Promise<Project | undefined> {
-    const result = await this.docClient.get({
+    const result = await this.docClient.send(new GetCommand({
       TableName: Config.projectTableName,
       Key: { id },
-    }).promise();
+    }));
 
     if (result.Item === undefined) {
       return undefined;
@@ -56,13 +57,13 @@ class Db implements IDatabase {
   }
 
   public async getAllProjects(): Promise<Project[]> {
-    const result = await this.docClient.scan({
+    const result = await this.docClient.send(new ScanCommand({
       TableName: Config.projectTableName,
-    }).promise();
+    }));
 
     if (result.Items === undefined) {
       // Special case because `scan()` can't really fail unless something is wrong
-      Logger.logError("Failed to fetch all projects, response was empty.", result.$response);
+      Logger.logError("Failed to fetch all projects, response was empty.", result);
       throw new Error("Failed to fetch all projects, response was empty. See logs for more details.");
     }
 
@@ -70,10 +71,10 @@ class Db implements IDatabase {
   }
 
   public async saveProject(project: Project): Promise<Project> {
-    await this.docClient.put({
+    await this.docClient.send(new PutCommand({
       TableName: Config.projectTableName,
       Item: project,
-    }).promise();
+    }));
 
     return project;
   }
@@ -85,10 +86,10 @@ class Db implements IDatabase {
       return undefined;
     } else {
       // Project exists - delete and return it
-      await this.docClient.delete({
+      await this.docClient.send(new DeleteCommand({
         TableName: Config.projectTableName,
         Key: { id },
-      }).promise();
+      }));
 
       return existingProject;
     }
