@@ -18,6 +18,15 @@ resource "aws_lambda_function" "lambda" {
       PROJECT_ID = var.project_id
     }
   }
+
+  lifecycle {
+    # Ignore independently deployed changes to code
+    ignore_changes = [
+      last_modified,
+      source_code_hash,
+      source_code_size,
+    ]
+  }
 }
 resource "aws_lambda_permission" "lambda" {
   for_each = local.all_lambda_functions
