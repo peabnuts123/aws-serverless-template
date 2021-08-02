@@ -15,7 +15,11 @@ class Db implements IDatabase {
 
   public constructor() {
     const dynamoDbClient = new DynamoDBClient(this.baseOptions);
-    this.docClient = DynamoDBDocumentClient.from(dynamoDbClient);
+    this.docClient = DynamoDBDocumentClient.from(dynamoDbClient, {
+      marshallOptions: {
+        convertClassInstanceToMap: true,
+      },
+    });
   }
 
   private get baseOptions(): DynamoDBClientConfig {
