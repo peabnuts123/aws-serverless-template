@@ -5,13 +5,11 @@ const { _: args, '$0': processName } = require('yargs').argv;
 const { execSync } = require('child_process');
 const { performance } = require('perf_hooks');
 const fs = require('fs');
-const path = require('path');
 const { LambdaClient, UpdateFunctionCodeCommand } = require('@aws-sdk/client-lambda');
 const archiver = require('archiver');
 
 // Config
 const buildDirectory = 'build';
-const zipFileName = "api.zip";
 
 // Validation
 const environmentName = args[0];
@@ -43,6 +41,8 @@ const terraformOutput = JSON.parse(rawTerraformOutput);
 const lambdaFunctionNames = terraformOutput['lambda_function_names'].value;
 /** @type {string} */
 const awsRegion = terraformOutput['aws_region'].value;
+/** @type {Record<string, Record<string,string>>} */
+const allLambdaFunctions = terraformOutput['all_lambda_functions'].value;
 
 // Build project
 exec('npm install && npm run build');
@@ -51,36 +51,35 @@ if (!fs.existsSync(buildDirectory)) {
   console.error("Cannot find build directory");
   process.exit(3);
 }
-// Copy package*.json files into build directory and enter
-fs.copyFileSync('package.json', path.join(buildDirectory, 'package.json'));
-fs.copyFileSync('package-lock.json', path.join(buildDirectory, 'package-lock.json'));
+// Enter the build directory
 process.chdir(buildDirectory);
 
-// Install node_modules needed by build
-exec('npm ci --only production');
-
 void (async () => {
-  await Promise.resolve();
-
-  console.log("Creating zip archive...");
-  await createZipArchive(zipFileName, '**/*');
-  console.log("Finished creating zip archive");
-
   const lambdaClient = new LambdaClient({
     region: awsRegion,
   });
 
-  // Deploy build artifact to lambda functions
+  // Deploy lambda functions
   const startTimeAll = performance.now();
-  for (let i = 0; i < lambdaFunctionNames.length; i++) {
-    const functionName = lambdaFunctionNames[i];
+  for (const lambdaFunctionId in allLambdaFunctions) {
+    // 0. Get metadata from Terraform output
+    const lambdaFunction = allLambdaFunctions[lambdaFunctionId];
+    const functionName = lambdaFunction.name;
+    const handlerRoot = lambdaFunction.handler.replace(/\.\w+$/, '');
 
+    // 1. Archive Handler's code into zip file
+    const archiveName = `handler_${lambdaFunctionId}.zip`;
+    console.log(`Creating archive: ${archiveName}...`);
+    await createZipArchive(archiveName, `${handlerRoot}/*`);
+
+
+    // 2. Deploy handler's code archive
     console.log(`Deploying function: ${functionName}...`);
     const startTime = performance.now();
 
     const response = await lambdaClient.send(new UpdateFunctionCodeCommand({
       FunctionName: functionName,
-      ZipFile: fs.readFileSync(zipFileName),
+      ZipFile: fs.readFileSync(archiveName),
     }));
     const endTime = performance.now();
 
