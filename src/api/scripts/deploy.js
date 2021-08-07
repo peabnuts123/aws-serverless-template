@@ -37,8 +37,6 @@ const rawTerraformOutput = exec('terraform output --json', {
   stdio: 'pipe',
 });
 const terraformOutput = JSON.parse(rawTerraformOutput);
-/** @type {string[]} */
-const lambdaFunctionNames = terraformOutput['lambda_function_names'].value;
 /** @type {string} */
 const awsRegion = terraformOutput['aws_region'].value;
 /** @type {Record<string, Record<string,string>>} */
@@ -88,7 +86,7 @@ void (async () => {
   }
   const endTimeAll = performance.now();
 
-  console.log(`Finished deploying code to ${lambdaFunctionNames.length} lambda functions after ${((endTimeAll - startTimeAll) / 1000).toFixed(1)}s`);
+  console.log(`Finished deploying code to ${Object.keys(allLambdaFunctions).length} lambda functions after ${((endTimeAll - startTimeAll) / 1000).toFixed(1)}s`);
 })();
 
 
