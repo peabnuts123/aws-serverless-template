@@ -1,15 +1,15 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 
-import Config from '../../config';
-import Db from '../../db';
-import IDatabase from '../../db/IDatabase';
-import Logger from '../../util/Logger';
-import errorResponse from '../../util/response/error';
-import ApiError from "../../errors/ApiError";
-import UnknownError from "../../errors/UnknownError";
-import ErrorModel from "../../errors/ErrorModel";
-import Project from "../../db/models/Project";
-import Task from "../../db/models/Task";
+import Config from '@app/config';
+import Db from '@app/db';
+import IDatabase from '@app/db/IDatabase';
+import Logger from '@app/util/Logger';
+import errorResponse from '@app/util/response/error';
+import ApiError from "@app/errors/ApiError";
+import UnknownError from "@app/errors/UnknownError";
+import ErrorModel from "@app/errors/ErrorModel";
+import Project from "@app/db/models/Project";
+import Task from "@app/db/models/Task";
 
 Logger.setLogLevel(Config.logLevel);
 

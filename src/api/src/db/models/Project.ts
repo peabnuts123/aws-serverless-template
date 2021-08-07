@@ -1,4 +1,4 @@
-import isArray from "../../util/is-array";
+import isArray from "@app/util/is-array";
 import Task, { TaskDto } from "./Task";
 
 

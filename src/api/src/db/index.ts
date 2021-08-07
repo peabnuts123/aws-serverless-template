@@ -2,8 +2,8 @@ import { DynamoDBClient, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuid } from 'uuid';
 
-import Config from '../config';
-import Logger, { LogLevel } from '../util/Logger';
+import Config from '@app/config';
+import Logger, { LogLevel } from '@app/util/Logger';
 
 import IDatabase, { AddProjectArgs, AddTaskArgs } from './IDatabase';
 import Project from './models/Project';

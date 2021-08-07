@@ -1,7 +1,7 @@
 import { APIGatewayProxyResultV2 } from 'aws-lambda';
 
-import Logger from '../Logger';
-import ApiError from '../../errors/ApiError';
+import Logger from '@app/util/Logger';
+import ApiError from '@app/errors/ApiError';
 
 /**
  * Create a not-found response that returns HTTP 404

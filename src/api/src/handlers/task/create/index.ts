@@ -1,22 +1,22 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 
-import Config from '../../../config';
-import Db from '../../../db';
-import IDatabase from '../../../db/IDatabase';
-import Logger from '../../../util/Logger';
-import errorResponse from '../../../util/response/error';
-import badRequestResponse from "../../../util/response/bad-request";
-import ApiError from "../../../errors/ApiError";
-import RequestValidationError from "../../../errors/RequestValidationError";
-import UnknownError from "../../../errors/UnknownError";
-import ErrorModel from "../../../errors/ErrorModel";
-import Project from "../../../db/models/Project";
-import { isValidProjectId } from "../../../validators/project";
-import { isValidTaskDescription } from "../../../validators/task";
-import ErrorId from "../../../errors/ErrorId";
-import notFoundResponse from "../../../util/response/not-found";
-import GenericError from "../../../errors/GenericError";
-import Task from "../../../db/models/Task";
+import Config from '@app/config';
+import Db from '@app/db';
+import IDatabase from '@app/db/IDatabase';
+import Logger from '@app/util/Logger';
+import errorResponse from '@app/util/response/error';
+import badRequestResponse from "@app/util/response/bad-request";
+import ApiError from "@app/errors/ApiError";
+import RequestValidationError from "@app/errors/RequestValidationError";
+import UnknownError from "@app/errors/UnknownError";
+import ErrorModel from "@app/errors/ErrorModel";
+import Project from "@app/db/models/Project";
+import { isValidProjectId } from "@app/validators/project";
+import { isValidTaskDescription } from "@app/validators/task";
+import ErrorId from "@app/errors/ErrorId";
+import notFoundResponse from "@app/util/response/not-found";
+import GenericError from "@app/errors/GenericError";
+import Task from "@app/db/models/Task";
 
 import { CreateTaskDto } from './dto';
 

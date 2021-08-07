@@ -1,5 +1,5 @@
-import { TaskDto } from "../db/models/Task";
-import isArray from "../util/is-array";
+import { TaskDto } from "@app/db/models/Task";
+import isArray from "@app/util/is-array";
 
 import { isValidTaskDto } from "./task";
 

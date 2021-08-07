@@ -1,6 +1,7 @@
 const path = require('path');
 const { promisify } = require('util');
 const glob = promisify(require('glob'));
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = async () => {
   return {
@@ -25,6 +26,10 @@ module.exports = async () => {
     },
     resolve: {
       extensions: ['.ts', '.js'],
+      plugins: [
+        /* For resolving path aliases defined in `tsconfig.json` */
+        new TsconfigPathsPlugin(),
+      ],
     },
   };
 };
@@ -33,7 +38,7 @@ module.exports = async () => {
  * Get a map of entrypoint names -> entry points, for processing by webpack
  * @returns {Promise<Record<string,string>>}
  */
- async function getEntryPoints() {
+async function getEntryPoints() {
   // All `index.ts` files under `src/handlers` are assumed to be handlers
   const allHandlers = await glob('./src/handlers/**/index.ts');
 

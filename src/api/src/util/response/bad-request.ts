@@ -1,6 +1,6 @@
 import { APIGatewayProxyResultV2 } from 'aws-lambda';
 
-import Logger from '../Logger';
+import Logger from '@app/util/Logger';
 
 /**
  * Create a bad-request response that returns HTTP 400

@@ -1,4 +1,4 @@
-import { TaskDto } from "../db/models/Task";
+import { TaskDto } from "@app/db/models/Task";
 
 export function isValidTaskId(maybeId: unknown): maybeId is string {
   return typeof maybeId === 'string' && maybeId.trim() !== '';
