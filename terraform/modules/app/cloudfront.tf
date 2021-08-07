@@ -138,7 +138,7 @@ resource "aws_cloudfront_distribution" "app" {
 
 # Cloudfront function - www-proxy
 resource "aws_cloudfront_function" "wwwproxy" {
-  name    = local.wwwproxy_function_name
+  name    = local.wwwproxy_function.name
   runtime = "cloudfront-js-1.0"
   code    = <<-CODE
     /* dummy handler, for provisioning only. */

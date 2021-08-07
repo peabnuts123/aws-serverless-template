@@ -14,7 +14,6 @@ const {
 
 // Config
 const buildDirectory = 'build';
-const codeFile = 'index.js';
 
 // Validation
 const environmentName = args[0];
@@ -44,8 +43,8 @@ const rawTerraformOutput = exec('terraform output --json', {
 const terraformOutput = JSON.parse(rawTerraformOutput);
 
 // Outputs from Terraform
-/** @type {string} */
-const wwwProxyFunctionName = terraformOutput['wwwproxy_function_name'].value;
+/** @type {Record<string,string>} */
+const wwwProxyFunctionConfig = terraformOutput['wwwproxy_function'].value;
 /** @type {string} */
 const cloudfrontDomainName = terraformOutput['cloudfront_domain_name'].value;
 /** @type {string} */
@@ -59,48 +58,14 @@ if (!fs.existsSync(buildDirectory)) {
   process.exit(3);
 }
 
-// Read function's code into memory
-const functionCode = fs.readFileSync(path.join(buildDirectory, codeFile));
-
 // Async block
 void (async () => {
   try {
-    console.log(`Deploying CloudFront function '${wwwProxyFunctionName}'...`);
     const cloudfrontClient = new CloudFrontClient({
       region: awsRegion,
     });
 
-    // 1. Get current function's etag
-    console.log("Get function's latest etag...");
-    const describeResponse = await cloudfrontClient.send(new DescribeFunctionCommand({
-      Name: wwwProxyFunctionName,
-    }));
-    console.log(JSON.stringify(describeResponse, null, 2));
-    let etag = describeResponse.ETag;
-
-    // 2. Update code for function
-    console.log("Update code for function...");
-    const updateResponse = await cloudfrontClient.send(new UpdateFunctionCommand({
-      Name: wwwProxyFunctionName,
-      IfMatch: etag,
-      FunctionConfig: {
-        Comment: `'www-proxy' function for distribution: ${cloudfrontDomainName}`,
-        Runtime: "cloudfront-js-1.0",
-      },
-      FunctionCode: functionCode,
-    }));
-    console.log(JSON.stringify(updateResponse, null, 2));
-    etag = updateResponse.ETag;
-
-    // 3. Publish new version of function as latest
-    console.log("Publish new version of function...");
-    const publishResponse = await cloudfrontClient.send(new PublishFunctionCommand({
-      Name: wwwProxyFunctionName,
-      IfMatch: etag,
-    }));
-    console.log(JSON.stringify(publishResponse, null, 2));
-
-    console.log(`Successfully deployed code for CloudFront function '${wwwProxyFunctionName}'.`);
+    await deployCloudFrontFunction(wwwProxyFunctionConfig, cloudfrontClient);
   } catch (e) {
     console.error(e);
     process.exit(1);
@@ -121,4 +86,47 @@ function exec(command, options = {}) {
     encoding: 'utf-8',
     ...options,
   });
+}
+
+/**
+ * Given the config output from Terraform, deploy & publish code for a CloudFront Function
+ * @param {Record<string,string>} config Config from Terraform incl. name, handler, etc.
+ * @param {CloudFrontClient} client CloudFront client form AWS SDK
+ */
+async function deployCloudFrontFunction(config, client) {
+  console.log(`Deploying CloudFront function '${config.name}'...`);
+
+  const functionCode = fs.readFileSync(path.join(buildDirectory, config.handler));
+
+  // 1. Get current function's etag
+  console.log("Get function's latest etag...");
+  const describeResponse = await client.send(new DescribeFunctionCommand({
+    Name: config.name,
+  }));
+  console.log(JSON.stringify(describeResponse, null, 2));
+  let etag = describeResponse.ETag;
+
+  // 2. Update code for function
+  console.log("Update code for function...");
+  const updateResponse = await client.send(new UpdateFunctionCommand({
+    Name: config.name,
+    IfMatch: etag,
+    FunctionConfig: {
+      Comment: `'www-proxy' function for distribution: ${cloudfrontDomainName}`,
+      Runtime: "cloudfront-js-1.0",
+    },
+    FunctionCode: functionCode,
+  }));
+  console.log(JSON.stringify(updateResponse, null, 2));
+  etag = updateResponse.ETag;
+
+  // 3. Publish new version of function as latest
+  console.log("Publish new version of function...");
+  const publishResponse = await client.send(new PublishFunctionCommand({
+    Name: config.name,
+    IfMatch: etag,
+  }));
+  console.log(JSON.stringify(publishResponse, null, 2));
+
+  console.log(`Successfully deployed code for CloudFront function '${config.name}'.`);
 }

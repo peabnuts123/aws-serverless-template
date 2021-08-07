@@ -18,7 +18,7 @@ module.exports = {
     "test/.*\\.test.[jt]s$",
   ],
   moduleNameMapper: {
-    "^/(.*)$": "<rootDir>/$1", // parcel module resolutions
+    "^/(.*)$": "<rootDir>/$1", // parcel module resolutions // @TODO update
   },
   coverageDirectory: 'coverage',
   collectCoverageFrom: [

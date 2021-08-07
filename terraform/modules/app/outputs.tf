@@ -25,7 +25,7 @@ output "www_bucket_name" {
   description = "S3 bucket name, for deploying www project"
 }
 
-output "wwwproxy_function_name" {
-  value = aws_cloudfront_function.wwwproxy.name
-  description = "Name of 'www-proxy' CloudFront Function, for deplying handler code"
+output "wwwproxy_function" {
+  value = local.wwwproxy_function
+  description = "Details of 'www-proxy' CloudFront Function, for deploying handler code"
 }

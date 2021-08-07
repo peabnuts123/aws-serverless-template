@@ -6,7 +6,7 @@ This is the "app" project. It contains code to do with the main entrypoint of th
 
 The "app" project is relatively simple. The CloudFront Functions are pure JavaScript (written in TypeScript, of course). They cannot reference any libraries and must compile down to a single file. CloudFront Functions have tight restrictions on the amount of memory they consume and their execution time; read more about these restrictions in-detail [here](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/edge-functions.html).
 
-The handler functions are compiled using [Parcel](https://v2.parceljs.org/) (using babel under the hood). This compiles them down to 1 small file.
+The handler functions are compiled using a simple [Webpack](https://webpack.js.org/) config. This compiles them down to 1 small file.
 
 ## Functions
 
