@@ -1,5 +1,5 @@
-import { invokeHandler } from '/test/util/invoke-handler';
-import handler from '/src/handlers/www-proxy/handler';
+import { invokeHandler } from '@test/util/invoke-handler';
+import { handler } from '@app/handlers/www-proxy';
 
 describe("www-proxy handler", () => {
   test("Given an extant URL, resolves the correct object", () => {

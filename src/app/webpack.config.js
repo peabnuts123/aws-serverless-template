@@ -1,6 +1,7 @@
 const path = require('path');
 const { promisify } = require('util');
 const glob = promisify(require('glob'));
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = async () => {
   return {
@@ -25,6 +26,10 @@ module.exports = async () => {
     },
     resolve: {
       extensions: ['.ts', '.js'],
+      plugins: [
+        /* For resolving path aliases defined in `tsconfig.json` */
+        new TsconfigPathsPlugin(),
+      ],
     },
   };
 };

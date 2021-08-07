@@ -3,10 +3,12 @@
   "compilerOptions": {
     "noEmit": true,
     "baseUrl": ".",                           /* Base directory to resolve non-absolute module names. */
-    "types": ["@types/jest"],
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-      "/*": [
-        "../*"
+      "@app/*": [
+        "../src/*"
+      ],
+      "@test/*": [
+        "./*"
       ],
     },
   },

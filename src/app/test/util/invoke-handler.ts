@@ -1,4 +1,4 @@
-import { CloudFrontFunctionHandler, CloudFrontFunctionEvent, CloudFrontFunctionRequest } from "/src/util/cloudfront-types";
+import { CloudFrontFunctionHandler, CloudFrontFunctionEvent, CloudFrontFunctionRequest } from "@app/util/cloudfront-types";
 
 export function invokeHandler(
   handler: CloudFrontFunctionHandler,

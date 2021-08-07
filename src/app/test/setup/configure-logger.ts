@@ -1,3 +1,3 @@
-import Logger, { LogLevel } from '/src/util/Logger';
+import Logger, { LogLevel } from '@app/util/Logger';
 
 Logger.setLogLevel(LogLevel.none);
