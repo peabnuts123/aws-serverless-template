@@ -12,11 +12,14 @@ export default class TodoStore {
   private projects!: Project[];
   @observable
   private hasLoaded!: boolean;
+  @observable
+  private isLoading!: boolean;
 
   public constructor() {
     makeObservable(this);
     this.projects = [];
     this.hasLoaded = false;
+    this.isLoading = false;
   }
 
   @action
@@ -28,10 +31,12 @@ export default class TodoStore {
 
   @action
   public async refreshAllProjects(): Promise<void> {
+    this.isLoading = true;
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const projects = await ProjectService.getAll();
     runInAction(() => {
       Logger.log(LogLevel.debug, "Refreshed projects");
+      this.isLoading = false;
       this.hasLoaded = true;
       this.projects = projects;
     });
@@ -121,5 +126,13 @@ export default class TodoStore {
   @computed
   public get HasLoaded(): boolean {
     return this.hasLoaded;
+  }
+  @computed
+  public get IsLoading(): boolean {
+    return this.isLoading;
+  }
+  @computed
+  public get NeedsRefreshing(): boolean {
+    return !this.IsLoading && !this.HasLoaded;
   }
 }

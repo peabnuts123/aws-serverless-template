@@ -9,15 +9,15 @@ import {
   XSquare as CancelIcon,
   PlusSquare as CreateIcon,
 } from 'react-feather';
+import classNames from "classnames";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 import { useStores } from "@app/stores";
 import Logger from "@app/util/Logger";
 import Spinner from "@app/components/spinner";
 import Task from "@app/models/Task";
 import AutoSizeTextarea from "@app/components/auto-size-textarea";
-import classNames from "classnames";
-import Link from "next/link";
-import { useRouter } from "next/router";
 
 interface RouteParams {
   projectId: string;
@@ -35,7 +35,7 @@ const ProjectPage = observer((() => {
   const { projectId } = Router.query as unknown as RouteParams; // @NOTE Type laundering
 
   useEffect(() => {
-    if (!TodoStore.HasLoaded) {
+    if (TodoStore.NeedsRefreshing) {
       void TodoStore.refreshAllProjects();
     }
   });
