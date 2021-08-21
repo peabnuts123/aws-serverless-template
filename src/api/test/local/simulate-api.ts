@@ -44,7 +44,7 @@ app.listen(SERVER_PORT, () => {
 
 
 // ROUTES
-// These need to match the definitions in `terraform/modules/api/api-gateway.tf`
+// These need to match the definitions in `terraform/modules/api/locals.tf`
 const router = Router();
 // Project
 router.post('/project', proxyHandler(CreateProjectHandler));
