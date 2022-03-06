@@ -16,7 +16,9 @@ DynamoDB can't be easily mocked so when running the project locally, Localstack 
 
 ### API (src/api)
 
-The API is written in TypeScript for performance reasons. JavaScript is very quick to start up, so "cold-boot" times are relatively low (a second or so). Each API endpoint exports a handler function for that particular endpoint. In AWS these functions are each deployed to their own Lambda and wired together using API Gateway. In local development, a simple express server is started which maps the endpoints to each handler function.
+```@TODO Rewrite documentation for .NET API```
+
+The API is written in ASP.NET ~~TypeScript for performance reasons. JavaScript is very quick to start up, so "cold-boot" times are relatively low (a second or so). Each API endpoint exports a handler function for that particular endpoint. In AWS these functions are each deployed to their own Lambda and wired together using API Gateway. In local development, a simple express server is started which maps the endpoints to each handler function.~~
 
 When deployed, the API is proxied behind CloudFront so that the API and the frontend client can be served from the same domain.
 
