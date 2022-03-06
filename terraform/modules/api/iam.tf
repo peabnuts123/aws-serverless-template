@@ -1,7 +1,7 @@
 # Execution role for API Lambda
 resource "aws_iam_role" "lambda" {
   name        = "${var.project_id}_${var.environment_id}_api_lambda"
-  description = "Allow Lambda workers access to create logs and read DynamoDB"
+  description = "Grant Lambda API access to required services"
 
   # Allow Lambda AWS service to assume this role
   assume_role_policy = <<-POLICY
@@ -23,7 +23,7 @@ resource "aws_iam_role" "lambda" {
 
 resource "aws_iam_policy" "lambda" {
   name        = "${var.project_id}_${var.environment_id}_api_lambda"
-  description = "Allow Lambda workers access to create logs and read DynamoDB"
+  description = "Grant Lambda API access to required services"
 
   policy = <<-POLICY
   {
@@ -32,10 +32,12 @@ resource "aws_iam_policy" "lambda" {
       {
         "Effect": "Allow",
         "Action": [
-            "dynamodb:DeleteItem",
-            "dynamodb:PutItem",
-            "dynamodb:GetItem",
-            "dynamodb:Scan"
+          "dynamodb:DeleteItem",
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:Scan",
+          "dynamodb:DescribeTable"
         ],
         "Resource": "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${var.dynamodb_table_name}"
       },
@@ -48,6 +50,24 @@ resource "aws_iam_policy" "lambda" {
         "Resource": [
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name_prefix}*:*",
           "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/lambda/${local.lambda_name_prefix}*:log-stream:*"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ssm:GetParametersByPath"
+        ],
+        "Resource": [
+          "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.project_id}/${var.environment_id}/API/*"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ssm:PutParameter"
+        ],
+        "Resource": [
+          "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.project_id}/${var.environment_id}/API/DataProtection/*"
         ]
       }
     ]

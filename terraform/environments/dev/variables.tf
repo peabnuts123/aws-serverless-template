@@ -8,6 +8,7 @@ variable "aws_region" {
 variable "domain_name" {
   description = "URL for HTTPS certificate domain"
   type        = string
+  default     = null
 }
 
 variable "project_id" {

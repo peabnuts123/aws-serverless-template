@@ -6,7 +6,6 @@ services:
     image: localstack/localstack
     ports:
       - "4578:4566"
-      - "4571:4571"
     environment:
       - SERVICES=apigateway,cloudwatchlogs,iam,dynamodb,lambda,sts
       - DOCKER_HOST=unix:///var/run/docker.sock
@@ -24,11 +23,11 @@ services:
     depends_on:
       - localstack
     environment:
-      NODE_ENV: production
+      ASPNETCORE_ENVIRONMENT: production
       ENVIRONMENT_ID: docker
-      PORT: 8080 # Must match container port mounted in `ports`
+      PROJECT_ID: my-project
     ports:
-      - '8000:8080/tcp'
+      - '5232:80/tcp'
 
   www:
     container_name: 'my-project_www'

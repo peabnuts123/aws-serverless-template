@@ -5,8 +5,8 @@ output "aws_region" {
 output "api_url" {
   value = module.app.api_url
 }
-output "all_lambda_functions" {
-  value = module.app.all_lambda_functions
+output "lambda_function" {
+  value = module.app.lambda_function
 }
 output "www_bucket_name" {
   value = module.app.www_bucket_name

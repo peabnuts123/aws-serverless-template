@@ -5,5 +5,5 @@ output "s3_bucket_name" {
 
 # Domain name of the S3 bucket, to point cloudfront at
 output "s3_bucket_endpoint" {
-  value = aws_s3_bucket.www.website_endpoint
+  value = aws_s3_bucket_website_configuration.www.website_endpoint
 }

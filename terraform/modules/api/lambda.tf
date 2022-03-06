@@ -1,19 +1,17 @@
 # Lambda functions for each endpoint
-resource "aws_lambda_function" "lambda" {
-  for_each = local.all_lambda_functions
-
-  function_name = each.value.name
+resource "aws_lambda_function" "api" {
+  function_name = local.lambda_function.name
   filename      = var.code_package_file_path
-  description   = "Handler for ${var.project_id}: ${each.key}"
+  description   = "API for ${var.project_id}"
   role          = aws_iam_role.lambda.arn
-  handler       = each.value.handler
-  runtime       = "nodejs12.x"
-  memory_size   = 256
-  timeout       = 3
+  handler       = local.lambda_function.handler
+  runtime       = "dotnet6"
+  memory_size   = 1024
+  timeout       = 15
 
   environment {
     variables = {
-      NODE_ENV = "production"
+      ASPNETCORE_ENVIRONMENT = "Production"
       ENVIRONMENT_ID = var.environment_id
       PROJECT_ID = var.project_id
     }
@@ -28,10 +26,8 @@ resource "aws_lambda_function" "lambda" {
     ]
   }
 }
-resource "aws_lambda_permission" "lambda" {
-  for_each = local.all_lambda_functions
-
-  function_name = each.value.name
+resource "aws_lambda_permission" "api" {
+  function_name = aws_lambda_function.api.function_name
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
 

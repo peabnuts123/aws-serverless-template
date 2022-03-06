@@ -4,8 +4,8 @@ output "api_url" {
   value = module.api.invoke_url
 }
 
-output "all_lambda_functions" {
-  value = module.api.all_lambda_functions
+output "lambda_function" {
+  value = module.api.lambda_function
 }
 
 # Output the cloudfront domain, so we know how to access the distribution

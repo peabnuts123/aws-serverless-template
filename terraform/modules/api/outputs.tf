@@ -4,6 +4,6 @@ output "invoke_url" {
   description = "URL for invoking / accessing the API through API gateway"
 }
 
-output "all_lambda_functions" {
-  value = local.all_lambda_functions
+output "lambda_function" {
+  value = local.lambda_function
 }

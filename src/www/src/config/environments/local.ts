@@ -3,7 +3,7 @@ import { LogLevel } from "@app/util/Logger";
 
 const LocalConfig: ApplicationConfig = {
   ...GlobalConfig,
-  ApiHost: `http://localhost:8000`,
+  ApiHost: `http://localhost:5232`,
   LogLevel: LogLevel.debug,
 };
 

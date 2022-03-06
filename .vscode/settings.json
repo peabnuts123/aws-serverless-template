@@ -1,7 +1,7 @@
 {
   "eslint.workingDirectories": [
-    "src/api",
     "src/app",
     "src/www",
-  ]
+  ],
+  "omnisharp.useGlobalMono": "never"
 }
